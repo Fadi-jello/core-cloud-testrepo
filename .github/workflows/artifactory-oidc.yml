@@ -24,7 +24,7 @@ jobs:
         with:
           oidc-provider-name: ${{ env.OIDC_PROVIDER }}
           oidc-audience: jfrog  # <<< הוספה חשובה
-          download-repository: jfrog-basecli-remote
+          download-repository: ronma-jfrog-basecli-remote
           version: 2.74.1
 
       - name: Debug - Print OIDC Token Claims
