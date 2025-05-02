@@ -1,4 +1,4 @@
-name: oidc-poc
+ename: oidc-poc
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v4
         id: jfrog-auth
         env:
-          JF_URL: https://fadij.jfrog.io
+          JF_URL: https://elinaf.jfrog.io
           JF_PROJECT: ronma
           OIDC_PROVIDER: fadij
         with:
