@@ -35,6 +35,4 @@ jobs:
           OIDC_PROVIDER: "fadij"
         with:
           oidc-provider-name: ${{ env.OIDC_PROVIDER }}
-          oidc-audience: jfrog
-          download-repository: ronma-jfrog-basecli-remote
           version: 2.74.1
