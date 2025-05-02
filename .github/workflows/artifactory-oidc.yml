@@ -1,30 +1,38 @@
-name: oidc-poc
+name: Github to Artifactory OIDC Auth
 
 on:
   workflow_dispatch:
 
+env:
+  # הגדרות כלליות לסביבה שלך
+  JFROG_PROJECT: 'ronma'
+  JFROG_URL: 'https://elinaf.jfrog.io'
+  OIDC_PROVIDER: 'fadij'
+  DOWNLOAD_REPO: 'jfrog-basecli-remote'
+
 jobs:
   auth:
-    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
+
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Authenticate with Artifactory using OIDC
-        uses: jfrog/setup-jfrog-cli@v4
         id: jfrog-auth
+        uses: jfrog/setup-jfrog-cli@v4
         env:
-          JF_URL: https://elinaf.jfrog.io
-          JF_PROJECT: ronma
-          OIDC_PROVIDER: fadij
+          JF_URL: ${{ env.JFROG_URL }}
+          JF_PROJECT: ${{ env.JFROG_PROJECT }}
+          OIDC_PROVIDER: ${{ env.OIDC_PROVIDER }}
         with:
           oidc-provider-name: ${{ env.OIDC_PROVIDER }}
-          oidc-audience: jfrog  # <<< הוספה חשובה
-          download-repository: ronma-jfrog-basecli-remote
+          oidc-audience: jfrog
+          download-repository: ${{ env.DOWNLOAD_REPO }}
           version: 2.74.1
 
       - name: Debug - Print OIDC Token Claims
