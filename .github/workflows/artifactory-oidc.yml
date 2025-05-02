@@ -17,7 +17,7 @@ jobs:
       - name: Authenticate with Artifactory using OIDC
         uses: jfrog/setup-jfrog-cli@v4
         env:
-          JF_URL: https://fadij.jfrog.io
+          JF_URL: https://elinaf.jfrog.io
           JF_PROJECT: ronma
           OIDC_PROVIDER: fadij
         with:
