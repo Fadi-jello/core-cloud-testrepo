@@ -3,19 +3,20 @@ name: oidc-poc
 on:
   workflow_dispatch:
 
-permissions:
-  contents: read
-  id-token: write
-
 jobs:
   auth:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Authenticate with Artifactory using OIDC
         uses: jfrog/setup-jfrog-cli@v4
+        id: jfrog-auth
         env:
           JF_URL: https://elinaf.jfrog.io
           JF_PROJECT: ronma
@@ -24,3 +25,11 @@ jobs:
           oidc-provider-name: ${{ env.OIDC_PROVIDER }}
           download-repository: jfrog-basecli-remote
           version: 2.74.1
+
+      - name: Debug - Print OIDC Token Claims
+        run: |
+          echo "=== Raw ID Token ==="
+          echo "${{ steps.jfrog-auth.outputs.id_token }}"
+          echo ""
+          echo "=== Decoded Token Payload ==="
+          echo "${{ steps.jfrog-auth.outputs.id_token }}" | cut -d '.' -f2 | base64 -d | jq .
