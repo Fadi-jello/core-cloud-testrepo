@@ -5,10 +5,14 @@ on:
 
 env:
   # הגדרות כלליות לסביבה שלך
+  PULL_REPO: 'docker-remote'
+  DEV_REPO: 'ronma-heinztest-dev'
   JFROG_PROJECT: 'ronma'
-  JFROG_URL: 'https://elinaf.jfrog.io'
+  JFROG_URL: 'https://fadij.jfrog.io'
   OIDC_PROVIDER: 'fadij'
-  DOWNLOAD_REPO: 'ronma-jfrog-basecli-remote'
+  DOWNLOAD_REPO: 'jfrog-basecli-remote'
+
+  # הוספה של ריפו ל-PULL ו-DEV (כמו שביקשת)
 
 jobs:
   auth:
@@ -42,3 +46,8 @@ jobs:
           echo ""
           echo "=== Decoded Token Payload ==="
           echo "${{ steps.jfrog-auth.outputs.id_token }}" | cut -d '.' -f2 | base64 -d | jq .
+
+      - name: Debug - Show Repo Vars
+        run: |
+          echo "Pull Repo: ${{ env.PULL_REPO }}"
+          echo "Dev Repo: ${{ env.DEV_REPO }}"
