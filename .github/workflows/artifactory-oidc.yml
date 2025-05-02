@@ -8,7 +8,7 @@ env:
   JFROG_PROJECT: 'ronma'
   JFROG_URL: 'https://elinaf.jfrog.io'
   OIDC_PROVIDER: 'fadij'
-  DOWNLOAD_REPO: 'jfrog-basecli-remote'
+  DOWNLOAD_REPO: 'ronma-jfrog-basecli-remote'
 
 jobs:
   auth:
