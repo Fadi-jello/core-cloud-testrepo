@@ -10,8 +10,6 @@ env:
   JFROG_PROJECT: 'ronma'
   JFROG_URL: 'https://elinaf.jfrog.io'
   OIDC_PROVIDER: 'fadij'
-  DOWNLOAD_REPO: 'ronma-jfrog-basecli-remote'
-
   # הוספה של ריפו ל-PULL ו-DEV (כמו שביקשת)
 
 jobs:
