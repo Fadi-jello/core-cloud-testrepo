@@ -8,7 +8,7 @@ env:
   PULL_REPO: 'docker-remote'
   DEV_REPO: 'ronma-heinztest-dev'
   JFROG_PROJECT: 'ronma'
-  JFROG_URL: 'https://fadij.jfrog.io'
+  JFROG_URL: 'https://elinaf.jfrog.io'
   OIDC_PROVIDER: 'fadij'
   DOWNLOAD_REPO: 'jfrog-basecli-remote'
 
