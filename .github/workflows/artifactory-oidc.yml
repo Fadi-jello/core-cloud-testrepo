@@ -1,4 +1,4 @@
-ename: oidc-poc
+name: oidc-poc
 
 on:
   workflow_dispatch:
