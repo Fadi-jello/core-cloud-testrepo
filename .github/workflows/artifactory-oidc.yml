@@ -31,23 +31,10 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v4
         env:
           JF_URL: ${{ env.JFROG_URL }}
-          JF_PROJECT: ${{ env.JFROG_PROJECT }}
-          OIDC_PROVIDER: ${{ env.OIDC_PROVIDER }}
+          JF_PROJECT: "ronma"
+          OIDC_PROVIDER: "fadij"
         with:
           oidc-provider-name: ${{ env.OIDC_PROVIDER }}
           oidc-audience: jfrog
-          download-repository: ${{ env.DOWNLOAD_REPO }}
+          download-repository: ronma-jfrog-basecli-remote
           version: 2.74.1
-
-      - name: Debug - Print OIDC Token Claims
-        run: |
-          echo "=== Raw ID Token ==="
-          echo "${{ steps.jfrog-auth.outputs.id_token }}"
-          echo ""
-          echo "=== Decoded Token Payload ==="
-          echo "${{ steps.jfrog-auth.outputs.id_token }}" | cut -d '.' -f2 | base64 -d | jq .
-
-      - name: Debug - Show Repo Vars
-        run: |
-          echo "Pull Repo: ${{ env.PULL_REPO }}"
-          echo "Dev Repo: ${{ env.DEV_REPO }}"
