@@ -34,3 +34,5 @@ jobs:
         with:
           oidc-provider-name: ${{ env.OIDC_PROVIDER }}
           version: 2.74.1
+      - name: Check JFrog CLI version
+        run: jf --version
