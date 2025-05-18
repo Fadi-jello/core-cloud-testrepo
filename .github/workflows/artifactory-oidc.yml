@@ -35,4 +35,6 @@ jobs:
           oidc-provider-name: ${{ env.OIDC_PROVIDER }}
           version: 2.74.1
       - name: Check JFrog CLI version
-        run: jf audit
+        run: 
+          export JFROG_CLI_LOG_LEVEL=DEBUG
+          jf audit
