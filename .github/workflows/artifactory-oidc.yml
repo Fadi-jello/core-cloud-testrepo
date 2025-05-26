@@ -7,6 +7,7 @@ env:
   # הגדרות כלליות לסביבה שלך
   PULL_REPO: 'docker-remote'
   DEV_REPO: 'ronma-heinztest-dev'
+  JFROG_PROJECT: 'ronma'
   JFROG_URL: 'https://elinaf.jfrog.io'
   OIDC_PROVIDER: 'fadij'
   # הוספה של ריפו ל-PULL ו-DEV (כמו שביקשת)
@@ -28,6 +29,7 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v4
         env:
           JF_URL: ${{ env.JFROG_URL }}
+          JF_PROJECT: "ronma"
           OIDC_PROVIDER: "fadij"
         with:
           oidc-provider-name: ${{ env.OIDC_PROVIDER }}
