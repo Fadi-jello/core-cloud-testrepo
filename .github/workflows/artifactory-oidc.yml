@@ -37,4 +37,4 @@ jobs:
       - name: Check JFrog CLI version
         run: |
           export JFROG_CLI_LOG_LEVEL=DEBUG
-          jf audit
+          jf audit --project ronma
