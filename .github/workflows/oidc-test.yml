@@ -1,5 +1,7 @@
 name: Test OIDC to Artifactory
-on: {workflow_dispatch:}
+
+on:
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -12,7 +14,6 @@ jobs:
       - name: 🔐  Get GitHub OIDC token
         id: get
         run: |
-          # בקש טוקן OIDC; ה-audience חייב להיות זהה לערך שתרשום ב-JFrog
           REQ_URL="${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://github.com/Fadi-jello"
           TOKEN=$(curl -sLS "$REQ_URL" \
                  -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
@@ -24,7 +25,7 @@ jobs:
       - name: 🔁  Exchange token with Artifactory
         run: |
           ART_URL="https://elinaf.jfrog.io/access/api/v1/oidc/token"
-          PROVIDER_NAME="fadije"      # בדיוק כמו ב-UI
+          PROVIDER_NAME="fadije"
           TOKEN=$(cat token.txt)
 
           curl -i -X POST "$ART_URL" \
