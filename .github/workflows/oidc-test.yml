@@ -1,36 +1,24 @@
 name: Test OIDC to Artifactory
+on: {workflow_dispatch:}
 
-on:
-  workflow_dispatch:
-
-permissions:
-  id-token: write
-  contents: read
+permissions: {id-token: write, contents: read}
 
 jobs:
   oidc-auth:
     runs-on: ubuntu-latest
     steps:
-      - name: 🔐 Request GitHub OIDC token
-        id: get-token
+      - name: Get GitHub OIDC token
         run: |
-          echo "🔐 Requesting GitHub OIDC token..."
-          OIDC_TOKEN=$(curl -sLS $ACTIONS_ID_TOKEN_REQUEST_URL \
+          TOKEN=$(curl -sLS $ACTIONS_ID_TOKEN_REQUEST_URL \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
+          echo "::add-mask::$TOKEN"
+          echo "$TOKEN" > github_jwt.txt
+          echo "$TOKEN" | cut -d '.' -f2 | base64 --decode | jq
 
-          echo "::add-mask::$OIDC_TOKEN"
-          echo "$OIDC_TOKEN" > github_jwt.txt
-          
-          echo "📥 Decoding JWT payload..."
-          echo "$OIDC_TOKEN" | cut -d '.' -f2 | base64 --decode | jq
-
-      - name: 🔁 Exchange token with Artifactory
+      - name: Exchange token with Artifactory
         run: |
-          echo "🔁 Sending token to Artifactory..."
-          
           ART_URL="https://elinaf.jfrog.io/access/api/v1/oidc/token"
           TOKEN=$(cat github_jwt.txt)
-
           curl -i -X POST "$ART_URL" \
             -H "Content-Type: application/json" \
             -d '{
