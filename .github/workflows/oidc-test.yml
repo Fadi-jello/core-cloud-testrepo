@@ -1,7 +1,5 @@
 name: Test OIDC to Artifactory
-
-on:
-  workflow_dispatch:
+on: {workflow_dispatch:}
 
 permissions:
   id-token: write
@@ -12,27 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🔐  Get GitHub OIDC token
+        id: get
         run: |
-          # מוסיפים audience זהה להגדרת ה-Provider
+          # בקש טוקן OIDC; ה-audience חייב להיות זהה לערך שתרשום ב-JFrog
           REQ_URL="${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://github.com/Fadi-jello"
           TOKEN=$(curl -sLS "$REQ_URL" \
-            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
+                 -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
           echo "::add-mask::$TOKEN"
           echo "$TOKEN" > token.txt
-          # הדפס payload לבדיקה
+          echo "Payload:"
           cut -d '.' -f2 token.txt | base64 -d | jq
 
       - name: 🔁  Exchange token with Artifactory
         run: |
           ART_URL="https://elinaf.jfrog.io/access/api/v1/oidc/token"
-          PROVIDER="fadije"           # בדיוק כמו ב-UI
+          PROVIDER_NAME="fadije"      # בדיוק כמו ב-UI
           TOKEN=$(cat token.txt)
 
           curl -i -X POST "$ART_URL" \
             -H "Content-Type: application/json" \
             -d '{
-              "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-              "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-              "subject_token": "'"$TOKEN"'",
-              "provider_name": "'"$PROVIDER"'"
+              "grant_type":"urn:ietf:params:oauth:grant-type:token-exchange",
+              "subject_token_type":"urn:ietf:params:oauth:token-type:id_token",
+              "subject_token":"'"$TOKEN"'",
+              "provider_name":"'"$PROVIDER_NAME"'"
             }'
