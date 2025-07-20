@@ -21,6 +21,7 @@ jobs:
           echo "::add-mask::$TOKEN"
           echo $TOKEN | jq -R 'split(".") | .[1] | @base64d | fromjson' > decoded.json
           cat decoded.json
+          echo $TOKEN | cut -d '.' -f2 | base64 --decode | jq
 
           echo $TOKEN > github_jwt.txt
 
