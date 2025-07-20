@@ -1,7 +1,11 @@
 name: Test OIDC to Artifactory
-on: {workflow_dispatch:}
 
-permissions: {id-token: write, contents: read}
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   oidc-auth:
