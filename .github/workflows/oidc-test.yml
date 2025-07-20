@@ -21,12 +21,12 @@ jobs:
           echo "::add-mask::$TOKEN"
           echo $TOKEN | jq -R 'split(".") | .[1] | @base64d | fromjson' > decoded.json
           cat decoded.json
-          echo $TOKEN | cut -d '.' -f2 | base64 --decode | jq
 
           echo $TOKEN > github_jwt.txt
 
       - name: Exchange Token with Artifactory
         run: |
+          echo $TOKEN | cut -d '.' -f2 | base64 --decode | jq
           ART_URL="https://elinaf.jfrog.io/access/api/v1/oidc/token"
           
           TOKEN=$(cat github_jwt.txt)
