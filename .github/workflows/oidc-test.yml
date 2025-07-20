@@ -24,6 +24,7 @@ jobs:
           echo "📥 Decoding JWT payload..."
           echo $TOKEN | cut -d '.' -f2 | base64 --decode | jq > decoded.json
           cat decoded.json
+          echo $TOKEN
 
       - name: Exchange Token with Artifactory
         run: |
