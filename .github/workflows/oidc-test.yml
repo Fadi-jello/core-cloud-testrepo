@@ -8,26 +8,26 @@ permissions:
   contents: read
 
 jobs:
-  oidc-auth:
+  oidc-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Get GitHub OIDC token
+      - name: 🔐  Get GitHub OIDC token
         run: |
-          TOKEN=$(curl -sLS $ACTIONS_ID_TOKEN_REQUEST_URL \
+          TOKEN=$(curl -sLS "$ACTIONS_ID_TOKEN_REQUEST_URL" \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
           echo "::add-mask::$TOKEN"
-          echo "$TOKEN" > github_jwt.txt
-          echo "$TOKEN" | cut -d '.' -f2 | base64 --decode | jq
+          echo "$TOKEN" > token.txt
+          echo "$TOKEN" | cut -d '.' -f2 | base64 -d | jq  # רק כדי לראות payload
 
-      - name: Exchange token with Artifactory
+      - name: 🔁  Exchange token with Artifactory
         run: |
           ART_URL="https://elinaf.jfrog.io/access/api/v1/oidc/token"
-          TOKEN=$(cat github_jwt.txt)
+          TOKEN=$(cat token.txt)
           curl -i -X POST "$ART_URL" \
             -H "Content-Type: application/json" \
             -d '{
-              "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-              "subject_token": "'"$TOKEN"'",
-              "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-              "provider_name": "fadije"
+              "grant_type":"urn:ietf:params:oauth:grant-type:token-exchange",
+              "subject_token":"'"$TOKEN"'",
+              "subject_token_type":"urn:ietf:params:oauth:token-type:jwt",
+              "provider_name":"fadije"
             }'
