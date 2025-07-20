@@ -32,7 +32,7 @@ jobs:
       - name: 🔁 Send token to Artifactory
         run: |
           ART_URL="https://elinaf.jfrog.io/access/api/v1/oidc/token"
-          PROVIDER_NAME="fadije"
+          PROVIDER_NAME="fadij"
           TOKEN=$(cat token.txt)
 
           curl -v -X POST "$ART_URL" \
