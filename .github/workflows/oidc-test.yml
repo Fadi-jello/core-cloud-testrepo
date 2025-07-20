@@ -14,6 +14,17 @@ jobs:
       - name: Dump GitHub OIDC Token
         id: auth
         run: |
+          OIDC_TOKEN=$(curl -sLS $ACTIONS_ID_TOKEN_REQUEST_URL \
+          -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
+          
+          echo "🔑 Raw OIDC Token:"
+          echo "$OIDC_TOKEN"
+          
+          echo "$OIDC_TOKEN" | jq -R 'split(".") | .[1] | @base64d | fromjson' > decoded.json
+          cat decoded.json
+          
+          echo "$OIDC_TOKEN" > github_jwt.txt
+
           echo "🔐 Requesting GitHub OIDC token..."
           export TOKEN=$(curl -sLS $ACTIONS_ID_TOKEN_REQUEST_URL \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
