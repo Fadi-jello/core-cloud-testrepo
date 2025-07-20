@@ -11,32 +11,20 @@ jobs:
   oidc-auth:
     runs-on: ubuntu-latest
     steps:
-      - name: Dump GitHub OIDC Token
-        id: auth
+      - name: 🔐 Request GitHub OIDC token
+        id: get-token
         run: |
-          OIDC_TOKEN=$(curl -sLS $ACTIONS_ID_TOKEN_REQUEST_URL \
-          -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
-          
-          echo "🔑 Raw OIDC Token:"
-          echo "$OIDC_TOKEN"
-          
-          echo "$OIDC_TOKEN" | jq -R 'split(".") | .[1] | @base64d | fromjson' > decoded.json
-          cat decoded.json
-          
-          echo "$OIDC_TOKEN" > github_jwt.txt
-
           echo "🔐 Requesting GitHub OIDC token..."
-          export TOKEN=$(curl -sLS $ACTIONS_ID_TOKEN_REQUEST_URL \
+          OIDC_TOKEN=$(curl -sLS $ACTIONS_ID_TOKEN_REQUEST_URL \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
 
-          echo "$TOKEN" > github_jwt.txt
-
+          echo "::add-mask::$OIDC_TOKEN"
+          echo "$OIDC_TOKEN" > github_jwt.txt
+          
           echo "📥 Decoding JWT payload..."
-          echo $TOKEN | cut -d '.' -f2 | base64 --decode | jq > decoded.json
-          cat decoded.json
-          echo $TOKEN
+          echo "$OIDC_TOKEN" | cut -d '.' -f2 | base64 --decode | jq
 
-      - name: Exchange Token with Artifactory
+      - name: 🔁 Exchange token with Artifactory
         run: |
           echo "🔁 Sending token to Artifactory..."
           
