@@ -3,31 +3,43 @@ name: Test OIDC to Artifactory
 on:
   workflow_dispatch:
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
-  oidc-test:
+  test-artifactory-oidc:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-      - name: 🔐  Get GitHub OIDC token
+      - name: ⏳ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔐 Request GitHub OIDC token
+        id: get_token
         run: |
-          TOKEN=$(curl -sLS "$ACTIONS_ID_TOKEN_REQUEST_URL" \
+          echo "Requesting GitHub OIDC token..."
+          export REQUEST_URL="${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://github.com/Fadi-jello"
+          TOKEN=$(curl -sLS "$REQUEST_URL" \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
           echo "::add-mask::$TOKEN"
           echo "$TOKEN" > token.txt
-          echo "$TOKEN" | cut -d '.' -f2 | base64 -d | jq  # רק כדי לראות payload
+          echo "✅ ID Token acquired"
 
-      - name: 🔁  Exchange token with Artifactory
+      - name: 🧪 Decode JWT payload (for debug)
+        run: |
+          cut -d '.' -f2 < token.txt | tr -- '+/' '-_' | tr -d '=' | base64 -d | jq || echo "⚠️ Failed to decode"
+
+      - name: 🔁 Send token to Artifactory
         run: |
           ART_URL="https://elinaf.jfrog.io/access/api/v1/oidc/token"
+          PROVIDER_NAME="fadije"
           TOKEN=$(cat token.txt)
-          curl -i -X POST "$ART_URL" \
+
+          curl -v -X POST "$ART_URL" \
             -H "Content-Type: application/json" \
             -d '{
-              "grant_type":"urn:ietf:params:oauth:grant-type:token-exchange",
-              "subject_token":"'"$TOKEN"'",
-              "subject_token_type":"urn:ietf:params:oauth:token-type:jwt",
-              "provider_name":"fadije"
+              "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+              "subject_token_type": "urn:ietf:params:oauth:token-type:id_token",
+              "subject_token": "'"$TOKEN"'",
+              "provider_name": "'"$PROVIDER_NAME"'"
             }'
