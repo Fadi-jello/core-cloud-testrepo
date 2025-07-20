@@ -3,43 +3,36 @@ name: Test OIDC to Artifactory
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  test-artifactory-oidc:
+  oidc-test:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
-      - name: ⏳ Checkout repository
-        uses: actions/checkout@v4
-
-      - name: 🔐 Request GitHub OIDC token
-        id: get_token
+      - name: 🔐  Get GitHub OIDC token
         run: |
-          echo "Requesting GitHub OIDC token..."
-          export REQUEST_URL="${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://github.com/Fadi-jello"
-          TOKEN=$(curl -sLS "$REQUEST_URL" \
+          # מוסיפים audience זהה להגדרת ה-Provider
+          REQ_URL="${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://github.com/Fadi-jello"
+          TOKEN=$(curl -sLS "$REQ_URL" \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
           echo "::add-mask::$TOKEN"
           echo "$TOKEN" > token.txt
-          echo "✅ ID Token acquired"
+          # הדפס payload לבדיקה
+          cut -d '.' -f2 token.txt | base64 -d | jq
 
-      - name: 🧪 Decode JWT payload (for debug)
-        run: |
-          cut -d '.' -f2 < token.txt | tr -- '+/' '-_' | tr -d '=' | base64 -d | jq || echo "⚠️ Failed to decode"
-
-      - name: 🔁 Send token to Artifactory
+      - name: 🔁  Exchange token with Artifactory
         run: |
           ART_URL="https://elinaf.jfrog.io/access/api/v1/oidc/token"
-          PROVIDER_NAME="fadij"
+          PROVIDER="fadije"           # בדיוק כמו ב-UI
           TOKEN=$(cat token.txt)
 
-          curl -v -X POST "$ART_URL" \
+          curl -i -X POST "$ART_URL" \
             -H "Content-Type: application/json" \
             -d '{
               "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-              "subject_token_type": "urn:ietf:params:oauth:token-type:id_token",
+              "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
               "subject_token": "'"$TOKEN"'",
-              "provider_name": "'"$PROVIDER_NAME"'"
+              "provider_name": "'"$PROVIDER"'"
             }'
