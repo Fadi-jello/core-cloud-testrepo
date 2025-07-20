@@ -14,24 +14,25 @@ jobs:
       - name: Dump GitHub OIDC Token
         id: auth
         run: |
-          echo "Getting token..."
+          echo "🔐 Requesting GitHub OIDC token..."
           export TOKEN=$(curl -sLS $ACTIONS_ID_TOKEN_REQUEST_URL \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
 
           echo "::add-mask::$TOKEN"
-          echo $TOKEN | jq -R 'split(".") | .[1] | @base64d | fromjson' > decoded.json
-          cat decoded.json
+          echo "$TOKEN" > github_jwt.txt
 
-          echo $TOKEN > github_jwt.txt
+          echo "📥 Decoding JWT payload..."
+          echo $TOKEN | cut -d '.' -f2 | base64 --decode | jq > decoded.json
+          cat decoded.json
 
       - name: Exchange Token with Artifactory
         run: |
-          echo $TOKEN | cut -d '.' -f2 | base64 --decode | jq
-          ART_URL="https://elinaf.jfrog.io/access/api/v1/oidc/token"
+          echo "🔁 Sending token to Artifactory..."
           
+          ART_URL="https://elinaf.jfrog.io/access/api/v1/oidc/token"
           TOKEN=$(cat github_jwt.txt)
 
-          curl -X POST "$ART_URL" \
+          curl -i -X POST "$ART_URL" \
             -H "Content-Type: application/json" \
             -d '{
               "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
