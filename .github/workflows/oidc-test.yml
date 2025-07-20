@@ -18,7 +18,6 @@ jobs:
           export TOKEN=$(curl -sLS $ACTIONS_ID_TOKEN_REQUEST_URL \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" | jq -r '.value')
 
-          echo "::add-mask::$TOKEN"
           echo "$TOKEN" > github_jwt.txt
 
           echo "📥 Decoding JWT payload..."
